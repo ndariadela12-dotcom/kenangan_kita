@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Album Kenangan Kita</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container page-galeri">
+        <header>
+            <h1>Our Memory Lane</h1>
+            <p class="subtitle">Setiap gambar punya cerita tersendiri.</p>
+        </header>
+        <main class="gallery-grid" id="gallery-grid"></main>
+        <section class="upload-area">
+            <h2>Tambah Kenangan Baru</h2>
+            <form id="photo-form">
+                <div class="form-group">
+                    <label for="photo-input" class="button-secondary">Pilih Foto dari Komputer</label>
+                    <input type="file" id="photo-input" accept="image/*" required>
+                    <span id="file-name">Tidak ada file dipilih</span>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="caption-input" placeholder="Tulis caption singkat di sini..." required>
+                </div>
+                <button type="submit" class="button-primary">Tambahkan Foto</button>
+            </form>
+        </section>
+        <div class="navigation-wrapper">
+             <a href="penutup.html" class="button-primary navigation-link">Lanjut ke Halaman Penutup →</a>
+        </div>
+    </div>
+<script>
+const photoForm = document.getElementById('photo-form');
+const photoInput = document.getElementById('photo-input');
+const captionInput = document.getElementById('caption-input');
+const galleryGrid = document.getElementById('gallery-grid');
+const fileNameSpan = document.getElementById('file-name');
+const STORAGE_KEY = 'ourStoryAlbum';
+function renderGallery() {
+    galleryGrid.innerHTML = '';
+    const savedPhotos = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    if (savedPhotos.length > 0) {
+        savedPhotos.forEach((photo, index) => {
+            const card = document.createElement('div');
+            card.className = 'photo-card';
+            card.dataset.index = index; 
+            card.innerHTML = `
+                <button class="delete-button" title="Hapus foto">×</button>
+                <img src="${photo.src}" alt="Kenangan kita">
+                <p>${photo.caption}</p>
+            `;
+            galleryGrid.appendChild(card);
+        });
+    } else {
+        galleryGrid.innerHTML = '<p class="empty-message">Album masih kosong. Yuk, kita isi dengan kenangan pertama kita.</p>';
+    }
+}
+document.addEventListener('DOMContentLoaded', renderGallery);
+photoInput.addEventListener('change', () => {
+    fileNameSpan.textContent = photoInput.files.length > 0 ? photoInput.files[0].name : 'Tidak ada file dipilih';
+});
+photoForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const file = photoInput.files[0];
+    const caption = captionInput.value;
+    if (file && caption.trim() !== '') {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const imageSrc = event.target.result;
+            const savedPhotos = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            savedPhotos.push({ src: imageSrc, caption: caption });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(savedPhotos));
+            photoForm.reset();
+            fileNameSpan.textContent = 'Tidak ada file dipilih';
+            renderGallery();
+        };
+        reader.readAsDataURL(file);
+    }
+});
+galleryGrid.addEventListener('click', (e) => {
+    if (e.target.classList.contains('delete-button')) {
+        if (confirm('Yakin mau hapus kenangan ini?')) {
+            const card = e.target.closest('.photo-card');
+            const indexToDelete = parseInt(card.dataset.index, 10);
+            let savedPhotos = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            savedPhotos.splice(indexToDelete, 1);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(savedPhotos));
+            renderGallery();
+        }
+    }
+});
+</script>
+</body>
+</html>
