@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Album Kenangan Kita</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container page-galeri">
+        <header>
+            <h1>Our Memory Lane</h1>
+            <p class="subtitle">Setiap gambar punya cerita tersendiri.</p>
+        </header>
+        <main class="gallery-grid" id="gallery-grid"></main>
+        <section class="upload-area">
+            <h2>Tambah Kenangan Baru</h2>
+            <form id="photo-form">
+                <div class="form-group">
+                    <label for="photo-input" class="button-secondary">Pilih Foto dari Komputer</label>
+                    <input type="file" id="photo-input" accept="image/*">
+                    <span id="file-name">Tidak ada file dipilih</span>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="caption-input" placeholder="Tulis caption singkat di sini...">
+                </div>
+                <button type="submit" class="button-primary">Tambahkan Foto</button>
+            </form>
+        </section>
+        <div class="navigation-wrapper">
+             <a href="penutup.html" class="button-primary navigation-link">Lanjut ke Halaman Penutup →</a>
+        </div>
+    </div>
+<script>
+const photoForm = document.getElementById('photo-form');
+const photoInput = document.getElementById('photo-input');
+const captionInput = document.getElementById('caption-input');
+const galleryGrid = document.getElementById('gallery-grid');
+const fileNameSpan = document.getElementById('file-name');
+const STORAGE_KEY = 'ourStoryAlbum';
+
+// --- FOTO YANG SUDAH ADA (MENGGUNAKAN FILE LOKAL) ---
+const predefinedPhotos = [
+    { src: 'gambar/kita1.jpg', caption: 'Ragunan Zoo Trip' },
+    { src: 'gambar/kita2.jpg', caption: 'ngoding dari jam 8 pagi-5 sore' },
+    { src: 'gambar/kita9.jpg', caption: 'Event sunsilk di sudirman' },
+    { src: 'gambar/kita10.jpg', caption: 'First time naik krl crrc' },
+    { src: 'gambar/kita11.jpg', caption: 'cp apa yaa?' },
+    { src: 'gambar/kita6.jpg', caption: 'First time kita nyoba naik biang lala' },
+    { src: 'gambar/kita7.jpg', caption: 'katanya mau berantem!!' },
+];
+
+function renderGallery() {
+    galleryGrid.innerHTML = '';
+    const userPhotos = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    
+    // Gabungkan foto yang sudah ada dengan foto dari pengguna
+    const allPhotos = [...predefinedPhotos, ...userPhotos];
+    
+    if (allPhotos.length > 0) {
+        allPhotos.forEach((photo, index) => {
+            const card = document.createElement('div');
+            card.className = 'photo-card';
+            card.dataset.index = index; 
+
+            // Tombol hapus hanya muncul untuk foto yang diupload pengguna
+            const deleteButtonHTML = index >= predefinedPhotos.length ? 
+                `<button class="delete-button" title="Hapus foto">×</button>` : '';
+
+            card.innerHTML = `
+                ${deleteButtonHTML}
+                <img src="${photo.src}" alt="Kenangan kita">
+                <p>${photo.caption}</p>
+            `;
+            galleryGrid.appendChild(card);
+        });
+    } else {
+        galleryGrid.innerHTML = '<p class="empty-message">Album masih kosong. Yuk, kita isi dengan kenangan pertama kita.</p>';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', renderGallery);
+
+photoInput.addEventListener('change', () => {
+    fileNameSpan.textContent = photoInput.files.length > 0 ? photoInput.files[0].name : 'Tidak ada file dipilih';
+});
+
+photoForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const file = photoInput.files[0];
+    const caption = captionInput.value;
+    if (file && caption.trim() !== '') {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const imageSrc = event.target.result;
+            const userPhotos = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            userPhotos.push({ src: imageSrc, caption: caption });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(userPhotos));
+            photoForm.reset();
+            fileNameSpan.textContent = 'Tidak ada file dipilih';
+            renderGallery();
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+galleryGrid.addEventListener('click', (e) => {
+    if (e.target.classList.contains('delete-button')) {
+        if (confirm('Yakin mau hapus kenangan ini?')) {
+            const card = e.target.closest('.photo-card');
+            const indexToDelete = parseInt(card.dataset.index, 10);
+            
+            // Sesuaikan indeks untuk array foto pengguna saja
+            const userPhotoIndexToDelete = indexToDelete - predefinedPhotos.length;
+
+            let userPhotos = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            if(userPhotoIndexToDelete >= 0 && userPhotoIndexToDelete < userPhotos.length) {
+                userPhotos.splice(userPhotoIndexToDelete, 1);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(userPhotos));
+                renderGallery();
+            }
+        }
+    }
+});
+</script>
+</body>
+</html>
