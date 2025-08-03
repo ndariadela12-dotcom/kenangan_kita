@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sebuah Tempat untuk Kita</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+</head>
+<body class="body-no-scroll">
+
+    <!-- BAGIAN BACKGROUND FOTO ABSTRAK -->
+    <div id="photo-background-wall" class="photo-background">
+        <img src="gambar/kita1.jpg" alt="background photo" style="--i:1;">
+        <img src="gambar/kita5.jpg" alt="background photo" style="--i:2;">
+        <img src="gambar/kita4.jpg" alt="background photo" style="--i:3;">
+        <img src="gambar/kita8.jpg" alt="background photo" style="--i:4;">
+        <img src="gambar/kita2.jpg" alt="background photo" style="--i:5;">
+        <img src="gambar/kita3.jpg" alt="background photo" style="--i:6;">
+    </div>
+
+    <!-- MODAL SURAT -->
+    <div id="letter-modal" class="modal-overlay hidden">
+        <div class="letter-content">
+            <button id="close-letter-button" class="close-button">×</button>
+            <h2>Hai Kamu,</h2>
+            <p>Aku nggak pandai merangkai kata, tapi aku mau kamu tahu, setiap momen sama kamu itu berharga. Tempat kecil ini aku buat untuk menyimpan semua cerita kita.</p>
+            <p>Semoga kamu suka ya. Sekarang, tutup surat ini dan ayo kita mulai lihat-lihat.</p>
+            <p class="signature">Dari aku, yang selalu sayang kamu.</p>
+        </div>
+    </div>
+
+    <!-- UNDANGAN AWAL DENGAN IKON SURAT -->
+    <div id="initial-prompt" class="initial-prompt-wrapper">
+        <div class="prompt-box">
+            <div class="envelope-icon">
+                <div class="envelope-back"></div>
+                <div class="envelope-letter"></div>
+                <div class="envelope-flap-left"></div>
+                <div class="envelope-flap-right"></div>
+                <div class="heart-seal"></div>
+            </div>
+            <h3>Sebuah Surat Untukmu</h3>
+            <p>( Klik Suratnya )</p>
+        </div>
+    </div>
+
+    <!-- KONTEN UTAMA (Awalnya tersembunyi dan baru muncul setelah surat ditutup) -->
+    <div id="main-content" class="container hidden">
+        <div class="hero-card">
+            <div class="hero-image">
+                <img src="gambar/kita6.jpg" alt="Foto utama kita">
+            </div>
+            <div class="hero-text">
+                <h1>A Special Place for Our Story.</h1>
+                <p>Selamat datang di tempat kecil kita. Di sini, kita akan menyimpan semua tawa, perjalanan, dan momen sederhana yang membentuk cerita kita.</p>
+                <a href="galeri.html" class="button-primary">Buka Album Kita</a>
+            </div>
+        </div>
+    </div>
+
+<script>
+    const initialPrompt = document.getElementById('initial-prompt');
+    const letterModal = document.getElementById('letter-modal');
+    const closeButton = document.getElementById('close-letter-button');
+    const mainContent = document.getElementById('main-content');
+    const photoBackground = document.getElementById('photo-background-wall');
+
+    initialPrompt.addEventListener('click', () => {
+        letterModal.classList.remove('hidden');
+        initialPrompt.classList.add('fade-out');
+        photoBackground.classList.add('fade-out');
+        setTimeout(() => {
+            initialPrompt.style.display = 'none';
+            photoBackground.style.display = 'none';
+        }, 500);
+    });
+
+    closeButton.addEventListener('click', () => {
+        letterModal.classList.add('hidden');
+        mainContent.classList.remove('hidden');
+    });
+</script>
+
+</body>
+</html>
